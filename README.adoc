@@ -1,0 +1,46 @@
+:toc:
+:toc-placement!:
+:toc-title: related to Log4Shell (CVE-2021-44228) vulnerability
+
+toc::[]
+
+The repository provides simple demonstration of the vulnerability as Java, Kotlin and Scala snippet.
+
+
+== why those snippets
+
+https://en.wikipedia.org/wiki/Log4Shell[Log4Shell] is a serious vulnerability and there are some rumors around it.
+
+The simple snippets only show that any language running on the JVM is impacted and the vulnerability can be triggered not only via HTTP headers. Don't feel safe if your application is not directly exposed to the internet, if user entered input is eventually logged, you might be impacted (see https://xkcd.com/327/[xkcd #327]).
+
+
+=== Some commenters take it to blame Java to be insecure
+
+Which is not true, as the vulnerability ...
+
+- is not related to the Java language, other JVM languages impacted also if they use an https://www.lunasec.io/docs/blog/log4j-zero-day/#log4j-v2[impacted log4j version], see the Kotlin and Scala example
+- happen because of a feature, which was enabled by default, of the log4j logging framework and could be misused
+
+
+=== The attack vector is not only via HTTP headers
+
+Any application using a vulnerable log4j version is impacted, if the logged string could be constructed to contain a JNDI call like `${jndi:ldap://127.0.0.1/xyz}`.
+So any logged input data might become a security risk.
+The snippets just log a literal string to trigger the JNDI call and lead in the basic setup to a thrown exception.
+If you want to see that the LDAP request going out of your network, replace the `${jndi:ldap...}` part by a string generated on https://log4shell.huntress.com/ (the page will not send an exploit, it will only log the LDAP call).
+
+
+== out of scope
+
+- The snippets do not demonstrate the remote code execution. If you are looking for detailed information about it you might have a look at this post +
+https://www.lunasec.io/docs/blog/log4j-zero-day/
+
+- The snippets will not provide any mitigations steps. Check instead +
+https://logging.apache.org/log4j/2.x/security.html#CVE-2021-45046 +
+https://logging.apache.org/log4j/2.x/ +
+https://www.lunasec.io/docs/blog/log4j-zero-day/#log4j-v2 +
+https://github.com/lhotari/log4shell-mitigation-tester +
+https://aws.amazon.com/de/security/security-bulletins/AWS-2021-006/ +
+https://msrc-blog.microsoft.com/2021/12/11/microsofts-response-to-cve-2021-44228-apache-log4j2/ +
+https://cloud.google.com/blog/products/identity-security/cloud-armor-waf-rule-to-help-address-apache-log4j-vulnerability +
+  … others
